@@ -3,15 +3,7 @@ import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBX819Al29iUot8ch69L9p1lVH-HxnjkRQ",
-  authDomain: "devtter-1ad60.firebaseapp.com",
-  projectId: "devtter-1ad60",
-  storageBucket: "devtter-1ad60.appspot.com",
-  messagingSenderId: "56294719505",
-  appId: "1:56294719505:web:00a735a94431f73e1031b0",
-  measurementId: "G-DD3HRQLL4B",
-};
+const firebaseConfig = JSON.parse(process.env.NEXT_PUBLIC_FIREBASE_CONFIG);
 
 const firebaseApp = !firebase.apps.length
   ? firebase.initializeApp(firebaseConfig)
@@ -53,20 +45,30 @@ export const addDevitt = ({ avatar, content, img, userId, userName }) =>
     sharedCount: 0,
   });
 
+const mapDevittFromFirebaseToDevittObject = (doc) => {
+  const data = doc.data();
+  const { id } = doc;
+  const { createdAt } = data;
+
+  return { ...data, id, createdAt: +createdAt.toDate() };
+};
+
+export const listenLastetDevitts = (callback) =>
+  db
+    .collection("devitts")
+    .orderBy("createdAt", "desc")
+    .limit(20)
+    .onSnapshot(({ docs }) => {
+      const newDevitts = docs.map(mapDevittFromFirebaseToDevittObject);
+      callback(newDevitts);
+    });
+
 export const fetchLatestDevitts = () =>
   db
     .collection("devitts")
     .orderBy("createdAt", "desc")
     .get()
-    .then(({ docs }) =>
-      docs.map((doc) => {
-        const data = doc.data();
-        const { id } = doc;
-        const { createdAt } = data;
-
-        return { ...data, id, createdAt: +createdAt.toDate() };
-      })
-    );
+    .then(({ docs }) => docs.map(mapDevittFromFirebaseToDevittObject));
 
 export const uploadImage = (file) => {
   const ref = firebase.storage().ref(`/images/${file.name}`);

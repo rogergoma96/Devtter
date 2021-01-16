@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Head from "next/head";
 import Avatar from "../../../components/Avatar";
 import Button from "../../../components/Button";
 import useUser from "../../../hooks/useUser";
@@ -88,6 +89,9 @@ const ComposeDevittPage = () => {
 
   return (
     <>
+      <Head>
+        <title>Crear un devitt / Devitt</title>
+      </Head>
       <section className="form-container">
         {user && (
           <section className="avatar-container">

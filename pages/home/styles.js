@@ -31,7 +31,6 @@ export default css`
 
   section {
     flex: 1;
-    padding-top: 16px;
   }
 
   nav {

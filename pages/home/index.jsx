@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Head from "next/head";
-import { fetchLatestDevitts } from "../../firebase/client";
+import { listenLastetDevitts } from "../../firebase/client";
 import useUser from "../../hooks/useUser";
 import Devitt from "../../components/Devitt";
 import HomeIcon from "../../components/Icons/Home";
@@ -14,9 +14,13 @@ const HomePage = () => {
   const user = useUser();
 
   useEffect(() => {
+    let unsuscribe;
+
     if (user) {
-      fetchLatestDevitts().then(setTimeline);
+      unsuscribe = listenLastetDevitts(setTimeline);
     }
+
+    return () => unsuscribe && unsuscribe();
   }, [user]);
 
   return (
